@@ -1,0 +1,8 @@
+configs/*.local
+
+.envrc
+.direnv
+
+dump.sql
+
+*.pyc
