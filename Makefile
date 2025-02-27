@@ -1,7 +1,8 @@
 DB_CONTAINER_NAME = gulp_db
 DB_USERNAME = gulp
 DB_PASSWORD = gulp
-DB_DATABASE = gulp
+DB_DEV_DB = gulp
+DB_TEST_DB = test
 
 
 # Makes sure that the database is running
@@ -30,4 +31,10 @@ dbsh: start_db
 
 # Runs the webserver
 run: start_db
-	@python3 -c "import gulp; gulp.run()"
+	@GULP_ENV=development python3 -c "import gulp; gulp.run()"
+
+# Runs the tests
+test: start_db
+	@-docker exec -it $(DB_CONTAINER_NAME) dropdb -U $(DB_USERNAME) "$(DB_TEST_DB)"
+	@docker exec -it $(DB_CONTAINER_NAME) createdb -U $(DB_USERNAME) "$(DB_TEST_DB)"
+	@GULP_ENV=testing python3 -m unittest gulp.database.tests
