@@ -1,7 +1,7 @@
 from flask import Flask
 
-from .configs import configs
-from .database import init_db
+from gulp.configs import configs
+from gulp.database import init_db
 
 app = Flask(__name__)
 

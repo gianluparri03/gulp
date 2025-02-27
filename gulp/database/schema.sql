@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS gulp_user (
     password VARCHAR(256) NOT NULL,
     token VARCHAR(256),
 
-    PRIMARY KEY (id)
+    CONSTRAINT gulp_user_pk PRIMARY KEY (id),
+    CONSTRAINT gulp_user_uq_email UNIQUE (email)
 );
 
 CREATE TABLE IF NOT EXISTS library (
@@ -17,7 +18,7 @@ CREATE TABLE IF NOT EXISTS library (
 
     PRIMARY KEY (id),
     UNIQUE (owner, name),
-    FOREIGN KEY (owner) REFERENCES gulp_user(id)
+    FOREIGN KEY (owner) REFERENCES gulp_user(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS author (
@@ -28,7 +29,7 @@ CREATE TABLE IF NOT EXISTS author (
     last_name VARCHAR(32) NOT NULL,
 
 	PRIMARY KEY (id),
-	FOREIGN KEY (owner) REFERENCES gulp_user(id),
+	FOREIGN KEY (owner) REFERENCES gulp_user(id) ON DELETE CASCADE,
 	UNIQUE (owner, last_name, first_name)
 );
 
@@ -40,7 +41,7 @@ CREATE TABLE IF NOT EXISTS saga (
 
     PRIMARY KEY (id),
     UNIQUE (library, name),
-    FOREIGN KEY (library) REFERENCES library(id)
+    FOREIGN KEY (library) REFERENCES library(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tag (
@@ -51,7 +52,7 @@ CREATE TABLE IF NOT EXISTS tag (
 
     PRIMARY KEY (id),
     UNIQUE (library, name),
-    FOREIGN KEY (library) REFERENCES library(id)
+    FOREIGN KEY (library) REFERENCES library(id) ON DELETE CASCADE
 );
 
 DO $$ BEGIN
@@ -80,7 +81,7 @@ CREATE TABLE IF NOT EXISTS book (
 
     PRIMARY KEY (id),
     UNIQUE (library, isbn),
-	FOREIGN KEY (library) REFERENCES library (id),
+	FOREIGN KEY (library) REFERENCES library (id) ON DELETE CASCADE,
     CHECK ((saga IS NULL) = (saga_n IS NULL)),
     CHECK (stars <= 5 AND stars > 0)
 );
@@ -90,8 +91,8 @@ CREATE TABLE IF NOT EXISTS book_authors (
     author INTEGER NOT NULL,
 
 	PRIMARY KEY(book, author),
-    FOREIGN KEY (book) REFERENCES book(id),
-    FOREIGN KEY (author) REFERENCES author(id)
+    FOREIGN KEY (book) REFERENCES book(id) ON DELETE CASCADE,
+    FOREIGN KEY (author) REFERENCES author(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS book_tags (
@@ -99,6 +100,6 @@ CREATE TABLE IF NOT EXISTS book_tags (
     tag INTEGER NOT NULL,
 
 	PRIMARY KEY (book, tag),
-    FOREIGN KEY (tag) REFERENCES tag(id),
-    FOREIGN KEY (book) REFERENCES book(id)
+    FOREIGN KEY (tag) REFERENCES tag(id) ON DELETE CASCADE,
+    FOREIGN KEY (book) REFERENCES book(id) ON DELETE CASCADE
 );
