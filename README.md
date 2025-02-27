@@ -16,7 +16,7 @@ Once you've installed the requirements (`pip install -r requirements.txt`) you
 can run the server locally. In order to do it, you just have to do `make run`.
 Note that this command will create a docker container where the database will be
 run; otherwise, you can customize the configs file and then run
-`@GULP_ENV=development python3 -c "import gulp; gulp.run()"`.
+`GULP_ENV=development python3 -c "import gulp; gulp.run()"`.
 
 In the same way, you can run the tests with `make test`; also this command uses
 the docker container.

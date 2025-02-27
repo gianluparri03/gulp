@@ -13,6 +13,8 @@ jobs:
           POSTGRES_USER: gulp
           POSTGRES_PASSWORD: gulp
           POSTGRES_DB: test
+        ports:
+          - "5432:5432"
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -30,5 +32,5 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run tests
         env:
-            GULP_ENV: "testing_ci"
+            GULP_ENV: "testing"
         run: python3 -m unittest gulp.database.tests
