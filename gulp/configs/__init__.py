@@ -5,7 +5,6 @@ from dotenv import dotenv_values
 configs = {}
 
 def load_configs():
-
     # Gets the environment type
     env = environ['GULP_ENV']
 

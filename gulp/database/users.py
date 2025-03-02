@@ -28,9 +28,9 @@ class Users:
         except DBError as e:
             match (e.diag.constraint_name):
                 case 'gulp_user_uq_email':
-                    raise ErrEmailNotAvailable
+                    raise GULPError(ErrEmailNotAvailable)
                 case _:
-                    raise ErrUnknown
+                    raise GULPError(ErrUnknown)
 
     @use_db
     def login(cur, email, password):
@@ -43,7 +43,7 @@ class Users:
             ph.verify(row[1], password)
             return User(id=row[0])
         except (VerificationError, InvalidHashError):
-            raise ErrWrongCredentials
+            raise GULPError(ErrWrongCredentials)
 
     @use_db
     def get(cur, id, email=''):
@@ -60,17 +60,17 @@ class Users:
         if (row := cur.fetchone()):
             return User(*row)
         else:
-            raise ErrUserUnknown
+            raise GULPError(ErrUserUnknown)
 
     @use_db
     def reset_password(cur, email, token, new):
-        user = Users.get(email=email)
+        user = Users.get(0, email=email)
 
         # Ensures the token is valid
         try:
-            ph.verify(token, self.token)
+            ph.verify(user.token, token)
         except (VerificationError, InvalidHashError):
-            raise ErrWrongToken
+            raise GULPError(ErrWrongToken)
 
         # Saves the new password
         user.change_password('', new, False)
@@ -79,76 +79,78 @@ class Users:
 @dataclass
 class User:
     id: int
-    name: str
-    email: str
-    password: str
-    token: str
+    name: str = ''
+    email: str = ''
+    password: str = ''
+    token: str = ''
 
     @use_db
-    def check(self, cur):
+    def check(cur, self):
         # Raises an error if the user does not exists
         cur.execute('SELECT id FROM gulp_user WHERE id=%s;', [self.id])
         if not cur.fetchone():
-            raise ErrUserUnknown
+            raise GULPError(ErrUserUnknown)
 
 
     @use_db
-    def change_name(self, cur, name):
+    def change_name(cur, self, name):
         self.check()
 
         # Saves the new name
-        cur.execute('UPDATE gulp_user SET name=%1 WHERE id=%1;', [self.id, name])
+        cur.execute('UPDATE gulp_user SET name=%s WHERE id=%s;', [name, self.id])
         self.name = name
 
     @use_db
-    def change_email(self, cur, email):
+    def change_email(cur, self, email):
         self.check()
 
         # Tries to save the new email
         try:
-            data = [self.id, email]
-            cur.execute('UPDATE gulp_user SET email=%1 WHERE id=%1;', data)
+            data = [email, self.id]
+            cur.execute('UPDATE gulp_user SET email=%s WHERE id=%s;', data)
             self.email = email
 
         # Handles the error
         except DBError as e:
             match (e.diag.constraint_name):
                 case 'gulp_user_uq_email':
-                    raise ErrEmailNotAvailable
+                    raise GULPError(ErrEmailNotAvailable)
                 case _:
-                    raise ErrUnknown
+                    raise GULPError(ErrUnknown)
 
     @use_db
-    def change_password(self, cur, old, new, check=True):
+    def change_password(cur, self, old, new, check=True):
         if check:
             # Ensures the user exists and the old password is right
             Users.login(Users.get(self.id).email, old)
 
         # Hashes and saves the password
         new = ph.hash(new)
-        cur.execute('UPDATE gulp_user SET password=%1 WHERE id=%1;', [self.id, new])
+        cur.execute('UPDATE gulp_user SET password=%s WHERE id=%s;', [new, self.id])
         self.password = new
 
     @use_db
-    def generate_token(self, cur):
+    def generate_token(cur, self):
         self.check()
         token = token_hex(18)
 
         # Hashes and saves the token
-        data = [self.id, ph.hash(token)]
-        cur.execute('UPDATE gulp_user SET token=%1 WHERE id=%1;', data)
+        data = [ph.hash(token), self.id]
+        cur.execute('UPDATE gulp_user SET token=%s WHERE id=%s;', data)
 
         # Returns it in plain
         self.token = token
         return token
 
     @use_db
-    def delete(self, cur, token):
+    def delete(cur, self, token):
+        self.check()
+
         # Ensures the token is valid
         try:
-            ph.verify(token, self.token)
+            ph.verify(self.token, token)
         except (VerificationError, InvalidHashError):
-            raise ErrWrongToken
+            raise GULPError(ErrWrongToken)
 
         # Deletes the user
-        cursor.execute('DELETE FROM gulp_users WHERE id=%s;', [self.id])
+        cur.execute('DELETE FROM gulp_user WHERE id=%s;', [self.id])

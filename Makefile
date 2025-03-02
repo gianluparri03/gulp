@@ -37,4 +37,4 @@ run: start_db
 test: start_db
 	@-docker exec -it $(DB_CONTAINER_NAME) dropdb -U $(DB_USERNAME) "$(DB_TEST_DB)"
 	@docker exec -it $(DB_CONTAINER_NAME) createdb -U $(DB_USERNAME) "$(DB_TEST_DB)"
-	@GULP_ENV=testing python3 -m unittest gulp.database.tests
+	@GULP_ENV=testing python3 -m unittest gulp.database.tests --verbose

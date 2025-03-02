@@ -1,8 +1,8 @@
 class GULPError(Exception):
     pass
 
-ErrEmailNotAvailable = GULPError('Email not available')
-ErrUnknown = GULPError('Unknown error')
-ErrWrongCredentials = GULPError('Wrong email or password')
-ErrUserUnkwnown = GULPError('Unknown user')
-ErrWrongToken = GULPError('Something went wrong')
+ErrEmailNotAvailable = 'Email not available'
+ErrUnknown = 'Unknown error'
+ErrWrongCredentials = 'Wrong email or password'
+ErrUserUnknown = 'Unknown user'
+ErrWrongToken = 'Something went wrong'

@@ -2,10 +2,7 @@ from flask import Flask
 
 from gulp.configs import load_configs, configs
 from gulp.database import init_db
-
-app = Flask(__name__)
-
-from .routes import *
+from gulp.web import app
 
 
 def run():
