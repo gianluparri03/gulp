@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <section class="section is-medium">
+        <div class="section-body">
+            <p class="title">Login</p>
+            <p class="subtitle">to see all your books!</p>
+
+            <form class="block" method="POST">
+                <div class="field">
+                    <label class="label" for="email">Email</label>
+                    <div class="control">
+                        <input class="input" type="email" id="email" name="email" placeholder="Your email" value="{{ email }}" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label" for="password">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" id="password" name="password" placeholder="Your password" required>
+                    </div>
+                </div>
+
+                {% if error %}
+                    <article class="message is-danger">
+                        <div class="message-body">{{ error }}</div>
+                    </article>
+                {% endif %}
+
+                <div class="field">
+                    <div class="control">
+                        <input class="button is-primary" type="submit" value="Login"> 
+                    </div>
+                </div>
+            </form>
+
+            <div class="block">
+                Don't have an account? <a href="/signup" class="link">Sign up now</a>!
+            </div>
+
+            <div class="block">
+                Forgot password? <a class="link">Reset it</a>.
+            </div>
+        </div>
+    </section>
+{% endblock %}

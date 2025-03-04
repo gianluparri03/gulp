@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <section class="section is-medium">
+        <div class="section-body">
+            <p class="title">Sign up</p>
+            <p class="subtitle">to add your first books!</p>
+
+            <form class="block" method="POST" onsubmit="return checkPasswords()">
+                <div class="field">
+                    <label class="label" for="name">Name</label>
+                    <div class="control">
+                        <input class="input" type="text" id="name" name="name" placeholder="Your first name" value="{{ name }}" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label" for="email">Email</label>
+                    <div class="control">
+                        <input class="input" type="email" id="email" name="email" placeholder="Your email" value="{{ email }}" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label" for="password">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" id="password" name="password" placeholder="Your password" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label" for="repeat-password">Repeat password</label>
+                    <div class="control">
+                        <input class="input" type="password" id="repeat-password" placeholder="Your password, again" required>
+                    </div>
+                </div>
+
+                {% if error %}
+                    <article class="message is-danger">
+                        <div class="message-body">{{ error }}</div>
+                    </article>
+                {% endif %}
+
+                <article id="no-match" class="message is-danger is-hidden">
+                    <div class="message-body">The two passwords do not match.</div>
+                </article>
+
+                <div class="field">
+                    <div class="control">
+                        <input class="button is-primary" type="submit" value="Sign up"> 
+                    </div>
+                </div>
+            </form>
+
+            <div class="block">
+                Already registered? <a href="/login" class="link">Login</a>!
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function checkPasswords() {
+            if (document.getElementById('password').value !=
+                document.getElementById('repeat-password').value) {
+                document.getElementById('no-match').classList.remove('is-hidden');
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+{% endblock %}
